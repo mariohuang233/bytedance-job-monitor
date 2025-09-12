@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job_type_name }} - 字节跳动职位监控{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                {% if job_type == 'campus' %}
+                    <i class="fas fa-graduation-cap text-success me-2"></i>
+                {% elif job_type == 'intern' %}
+                    <i class="fas fa-user-graduate text-warning me-2"></i>
+                {% else %}
+                    <i class="fas fa-users text-info me-2"></i>
+                {% endif %}
+                {{ job_type_name }}
+            </h2>
+            <span class="badge bg-primary fs-6">共 {{ jobs|length }} 个职位</span>
+        </div>
+    </div>
+</div>
+
+<!-- 搜索和过滤 -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="search" class="form-label">
+                            <i class="fas fa-search me-1"></i>关键词搜索
+                        </label>
+                        <input type="text" class="form-control" id="search" name="search" 
+                               value="{{ current_search }}" placeholder="搜索职位标题或描述...">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="city" class="form-label">
+                            <i class="fas fa-map-marker-alt me-1"></i>城市
+                        </label>
+                        <select class="form-select" id="city" name="city">
+                            <option value="">全部城市</option>
+                            {% for city in all_cities %}
+                            <option value="{{ city }}" {% if city == current_city %}selected{% endif %}>
+                                {{ city }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="department" class="form-label">
+                            <i class="fas fa-sitemap me-1"></i>部门
+                        </label>
+                        <select class="form-select" id="department" name="department">
+                            <option value="">全部部门</option>
+                            {% for dept in all_departments %}
+                            <option value="{{ dept }}" {% if dept == current_department %}selected{% endif %}>
+                                {{ dept }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter me-1"></i>筛选
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 职位列表 -->
+<div class="row">
+    {% if jobs %}
+        {% for job in jobs %}
+        <div class="col-12 mb-3">
+            <div class="card border-0 shadow-sm job-card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5 class="card-title mb-2">
+                                <a href="https://jobs.bytedance.com/campus/position/{{ job.job_id }}/detail" 
+                                   target="_blank" class="text-decoration-none">
+                                    {{ job.title }}
+                                    <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 0.8em;"></i>
+                                </a>
+                            </h5>
+                            <div class="mb-2">
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="fas fa-calendar me-1"></i>{{ job.publish_time }}
+                                </span>
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="fas fa-code me-1"></i>{{ job.code }}
+                                </span>
+                                {% if job.city_list %}
+                                    {% for city in job.city_list[:3] %}
+                                    <span class="badge bg-secondary me-1">
+                                        <i class="fas fa-map-marker-alt me-1"></i>{{ city.name }}
+                                    </span>
+                                    {% endfor %}
+                                    {% if job.city_list|length > 3 %}
+                                    <span class="badge bg-secondary">+{{ job.city_list|length - 3 }}</span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <p class="card-text text-muted mb-2">
+                                {{ job.description[:200] }}{% if job.description|length > 200 %}...{% endif %}
+                            </p>
+                            {% if job.requirement %}
+                            <div class="small text-muted">
+                                <strong>要求：</strong>{{ job.requirement[:150] }}{% if job.requirement|length > 150 %}...{% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="mb-2">
+                                {% if job.min_salary and job.max_salary %}
+                                <div class="text-success fw-bold mb-1">
+                                    <i class="fas fa-dollar-sign me-1"></i>
+                                    {{ job.min_salary }}k - {{ job.max_salary }}k
+                                </div>
+                                {% endif %}
+                                {% if job.department %}
+                                <div class="small text-muted mb-1">
+                                    <i class="fas fa-building me-1"></i>{{ job.department }}
+                                </div>
+                                {% endif %}
+                                {% if job.recruit_type_name %}
+                                <div class="small text-muted mb-2">
+                                    <i class="fas fa-tag me-1"></i>{{ job.recruit_type_name }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="d-grid">
+                                <a href="https://jobs.bytedance.com/campus/position/{{ job.job_id }}/detail" 
+                                   target="_blank" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>查看详情
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">暂无符合条件的职位</h4>
+                <p class="text-muted">请尝试调整搜索条件或稍后再试</p>
+                <a href="{{ url_for('jobs', job_type=job_type) }}" class="btn btn-primary">
+                    <i class="fas fa-refresh me-1"></i>重置筛选
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- 返回顶部按钮 -->
+<button id="backToTop" class="btn btn-primary position-fixed" 
+        style="bottom: 20px; right: 20px; display: none; z-index: 1000;">
+    <i class="fas fa-arrow-up"></i>
+</button>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 返回顶部功能
+const backToTopBtn = document.getElementById('backToTop');
+
+window.addEventListener('scroll', function() {
+    if (window.pageYOffset > 300) {
+        backToTopBtn.style.display = 'block';
+    } else {
+        backToTopBtn.style.display = 'none';
+    }
+});
+
+backToTopBtn.addEventListener('click', function() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+});
+
+// 职位卡片悬停效果
+document.querySelectorAll('.job-card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-2px)';
+        this.style.transition = 'transform 0.2s ease';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}字节跳动招聘信息 - 首页{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold text-primary mb-4">字节跳动招聘信息</h1>
+                <p class="lead mb-4">实时更新的职位信息，助您找到理想工作</p>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('jobs', job_type='campus') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-graduation-cap me-2"></i>校园招聘
+                    </a>
+                    <a href="{{ url_for('jobs', job_type='intern') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-user-graduate me-2"></i>实习招聘
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <canvas id="jobTypeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <!-- 统计卡片 -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
+                        <i class="fas fa-briefcase text-primary"></i>
+                    </div>
+                    <h3 class="stat-number text-primary mb-2">{{ stats.total }}</h3>
+                    <p class="card-text text-muted mb-0">总职位数</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
+                        <i class="fas fa-graduation-cap text-success"></i>
+                    </div>
+                    <h3 class="stat-number text-success mb-2">{{ stats.by_type.campus }}</h3>
+                    <p class="card-text text-muted mb-0">校园招聘</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
+                        <i class="fas fa-user-graduate text-warning"></i>
+                    </div>
+                    <h3 class="stat-number text-warning mb-2">{{ stats.by_type.intern }}</h3>
+                    <p class="card-text text-muted mb-0">实习招聘</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
+                        <i class="fas fa-users text-info"></i>
+                    </div>
+                    <h3 class="stat-number text-info mb-2">{{ stats.by_type.experienced }}</h3>
+                    <p class="card-text text-muted mb-0">社会招聘</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 快速导航 -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="section-title mb-4">快速导航</h2>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <a href="{{ url_for('jobs', job_type='campus') }}" class="card nav-card border-0 shadow-sm text-decoration-none h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-graduation-cap fa-3x text-success mb-3"></i>
+                            <h5 class="card-title text-dark">校园招聘</h5>
+                            <p class="card-text text-muted">面向应届毕业生的职位</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="{{ url_for('jobs', job_type='intern') }}" class="card nav-card border-0 shadow-sm text-decoration-none h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-graduate fa-3x text-warning mb-3"></i>
+                            <h5 class="card-title text-dark">实习招聘</h5>
+                            <p class="card-text text-muted">实习生职位机会</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="{{ url_for('jobs', job_type='experienced') }}" class="card nav-card border-0 shadow-sm text-decoration-none h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-users fa-3x text-info mb-3"></i>
+                            <h5 class="card-title text-dark">社会招聘</h5>
+                            <p class="card-text text-muted">面向有经验的专业人士</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 热门城市和部门 -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-map-marker-alt text-primary me-2"></i>热门城市
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for city, count in stats.top_cities[:8] %}
+                        <div class="col-6 mb-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">{{ city }}</span>
+                                <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-building text-primary me-2"></i>热门部门
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for dept, count in stats.top_departments[:8] %}
+                        <div class="col-6 mb-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">{{ dept }}</span>
+                                <span class="badge bg-success rounded-pill">{{ count }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据更新时间 -->
+    <div class="text-center mt-4">
+        <small class="text-muted">
+            <i class="fas fa-clock me-1"></i>
+            数据更新时间: <span id="update-time"></span>
+        </small>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 职位类型分布图表
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('jobTypeChart').getContext('2d');
+    const jobTypeChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['校园招聘', '实习招聘', '社会招聘'],
+            datasets: [{
+                data: [{{ stats.by_type.campus|default(0) }}, {{ stats.by_type.intern|default(0) }}, {{ stats.by_type.experienced|default(0) }}],
+                backgroundColor: [
+                    '#28a745',
+                    '#ffc107', 
+                    '#17a2b8'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
+
+    // 更新时间显示
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.getFullYear() + '-' + 
+            String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+            String(now.getDate()).padStart(2, '0') + ' ' + 
+            String(now.getHours()).padStart(2, '0') + ':' + 
+            String(now.getMinutes()).padStart(2, '0') + ':' + 
+            String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('update-time').textContent = timeString;
+    }
+
+    // 每秒更新时间
+    setInterval(updateTime, 1000);
+    updateTime();
+});
+</script>
+{% endblock %}

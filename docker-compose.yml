@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=False
+      - SECRET_KEY=your-production-secret-key
+      - DATA_DIR=/app/data
+      - HOST=0.0.0.0
+      - PORT=8080
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 可选：添加定时任务容器
+  scheduler:
+    build: .
+    environment:
+      - FLASK_ENV=production
+      - DATA_DIR=/app/data
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    command: |
+      sh -c '
+        while true; do
+          echo "开始数据抓取: $$(date)"
+          python3 by.py
+          echo "数据抓取完成: $$(date)"
+          sleep 7200  # 2小时
+        done
+      '
+    restart: unless-stopped
+    depends_on:
+      - web
