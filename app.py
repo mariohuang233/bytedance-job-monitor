@@ -27,12 +27,18 @@ app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
 
 def load_job_data():
     """加载职位数据"""
+    # 确保数据目录存在
+    os.makedirs(DATA_DIR, exist_ok=True)
+    
     if not os.path.exists(CACHE_FILE):
+        print(f"数据文件不存在: {CACHE_FILE}")
         return {'campus': [], 'intern': [], 'experienced': []}
     
     try:
         with open(CACHE_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            data = json.load(f)
+            print(f"成功加载数据: {sum(len(jobs) for jobs in data.values())} 个职位")
+            return data
     except Exception as e:
         print(f"加载数据失败: {e}")
         return {'campus': [], 'intern': [], 'experienced': []}
