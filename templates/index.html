@@ -217,6 +217,8 @@ const chartData = {
     intern: {{ stats.by_type.intern|default(0) }},
     experienced: {{ stats.by_type.experienced|default(0) }}
 };
+const chartLabels = ['校园招聘', '实习招聘', '社会招聘'];
+const chartValues = [chartData.campus, chartData.intern, chartData.experienced];
 
 // 职位类型分布图表
 document.addEventListener('DOMContentLoaded', function() {
