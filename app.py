@@ -172,6 +172,48 @@ def api_stats():
     stats = get_statistics(data)
     return jsonify(stats)
 
+@app.route('/api/refresh', methods=['POST'])
+def refresh_data():
+    """API接口：刷新数据"""
+    try:
+        import subprocess
+        import sys
+        
+        # 在后台运行数据抓取脚本
+        result = subprocess.run(
+            [sys.executable, 'by.py'],
+            cwd=os.path.dirname(__file__),
+            capture_output=True,
+            text=True,
+            timeout=300  # 5分钟超时
+        )
+        
+        if result.returncode == 0:
+            return jsonify({
+                'success': True,
+                'message': '数据刷新成功',
+                'timestamp': datetime.now().isoformat()
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': f'数据刷新失败: {result.stderr}',
+                'timestamp': datetime.now().isoformat()
+            }), 500
+            
+    except subprocess.TimeoutExpired:
+        return jsonify({
+            'success': False,
+            'message': '数据刷新超时，请稍后再试',
+            'timestamp': datetime.now().isoformat()
+        }), 408
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'数据刷新出错: {str(e)}',
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
 if __name__ == '__main__':
     # 开发环境启动
     host = os.getenv('HOST', '0.0.0.0')

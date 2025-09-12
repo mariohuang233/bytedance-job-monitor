@@ -28,6 +28,21 @@
 </div>
 
 <div class="container my-5">
+    <!-- 数据刷新按钮 -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <button id="refreshBtn" class="btn btn-success btn-lg" onclick="refreshData()">
+                <i class="fas fa-sync-alt me-2"></i>刷新数据
+            </button>
+            <div id="refreshStatus" class="mt-2" style="display: none;">
+                <div class="spinner-border spinner-border-sm text-success me-2" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <span class="text-muted">正在刷新数据，请稍候...</span>
+            </div>
+        </div>
+    </div>
+    
     <!-- 统计卡片 -->
     <div class="row mb-5">
         <div class="col-md-3 mb-4">
@@ -218,5 +233,43 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(updateTime, 1000);
     updateTime();
 });
+
+// 刷新数据
+function refreshData() {
+    const refreshBtn = document.getElementById('refreshBtn');
+    const refreshStatus = document.getElementById('refreshStatus');
+    
+    // 显示加载状态
+    refreshBtn.disabled = true;
+    refreshStatus.style.display = 'block';
+    
+    // 调用刷新API
+    fetch('/api/refresh', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // 刷新成功，重新加载页面
+            alert('数据刷新成功！页面将自动刷新。');
+            location.reload();
+        } else {
+            // 刷新失败
+            alert('数据刷新失败：' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('刷新数据时出错:', error);
+        alert('数据刷新出错，请稍后再试。');
+    })
+    .finally(() => {
+        // 恢复按钮状态
+        refreshBtn.disabled = false;
+        refreshStatus.style.display = 'none';
+    });
+}
 </script>
 {% endblock %}
