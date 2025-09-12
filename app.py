@@ -79,6 +79,11 @@ def get_statistics(data):
     
     return stats
 
+@app.route('/health')
+def health_check():
+    """健康检查端点"""
+    return {'status': 'healthy', 'timestamp': datetime.now().isoformat()}, 200
+
 @app.route('/')
 def index():
     """首页"""
