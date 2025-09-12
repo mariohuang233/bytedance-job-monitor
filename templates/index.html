@@ -1,33 +1,27 @@
 {% extends "base.html" %}
 
-{% block title %}字节跳动招聘信息 - 首页{% endblock %}
+{% block title %}职位招聘信息 - 首页{% endblock %}
 
 {% block content %}
-<div class="hero-section">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold text-primary mb-4">字节跳动招聘信息</h1>
-                <p class="lead mb-4">实时更新的职位信息，助您找到理想工作</p>
-                <div class="d-flex gap-3">
-                    <a href="{{ url_for('jobs', job_type='campus') }}" class="btn btn-primary btn-lg">
+<div class="container-fluid">
+    <!-- 英雄区域 -->
+    <div class="hero-section bg-primary text-white py-5 mb-4 rounded">
+        <div class="container text-center">
+            <h1 class="display-4 mb-3">职位招聘信息平台</h1>
+            <p class="lead mb-4">实时更新的校园招聘、实习招聘和社会招聘信息</p>
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <a href="{{ url_for('campus_jobs') }}" class="btn btn-light btn-lg me-3 mb-2">
                         <i class="fas fa-graduation-cap me-2"></i>校园招聘
                     </a>
-                    <a href="{{ url_for('jobs', job_type='intern') }}" class="btn btn-outline-primary btn-lg">
+                    <a href="{{ url_for('intern_jobs') }}" class="btn btn-outline-light btn-lg mb-2">
                         <i class="fas fa-user-graduate me-2"></i>实习招聘
                     </a>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="chart-container">
-                    <canvas id="jobTypeChart"></canvas>
-                </div>
-            </div>
         </div>
     </div>
-</div>
 
-<div class="container my-5">
     <!-- 数据刷新按钮 -->
     <div class="row mb-4">
         <div class="col-12 text-center">
@@ -35,139 +29,171 @@
                 <i class="fas fa-sync-alt me-2"></i>刷新数据
             </button>
             <div id="refreshStatus" class="mt-2" style="display: none;">
-                <div class="spinner-border spinner-border-sm text-success me-2" role="status">
+                <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
                 <span class="text-muted">正在刷新数据，请稍候...</span>
             </div>
         </div>
     </div>
-    
+
     <!-- 统计卡片 -->
-    <div class="row mb-5">
-        <div class="col-md-3 mb-4">
-            <div class="card stat-card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <div class="stat-icon bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
-                        <i class="fas fa-briefcase text-primary"></i>
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">总职位数</h6>
+                            <h2 class="mb-0">{{ stats.total_jobs|default(0) }}</h2>
+                        </div>
+                        <div class="text-white-50">
+                            <i class="fas fa-briefcase fa-2x"></i>
+                        </div>
                     </div>
-                    <h3 class="stat-number text-primary mb-2">{{ stats.total }}</h3>
-                    <p class="card-text text-muted mb-0">总职位数</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card stat-card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <div class="stat-icon bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
-                        <i class="fas fa-graduation-cap text-success"></i>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">校园招聘</h6>
+                            <h2 class="mb-0">{{ stats.by_type.campus|default(0) }}</h2>
+                        </div>
+                        <div class="text-white-50">
+                            <i class="fas fa-graduation-cap fa-2x"></i>
+                        </div>
                     </div>
-                    <h3 class="stat-number text-success mb-2">{{ stats.by_type.campus }}</h3>
-                    <p class="card-text text-muted mb-0">校园招聘</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card stat-card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <div class="stat-icon bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
-                        <i class="fas fa-user-graduate text-warning"></i>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">实习招聘</h6>
+                            <h2 class="mb-0">{{ stats.by_type.intern|default(0) }}</h2>
+                        </div>
+                        <div class="text-white-50">
+                            <i class="fas fa-user-graduate fa-2x"></i>
+                        </div>
                     </div>
-                    <h3 class="stat-number text-warning mb-2">{{ stats.by_type.intern }}</h3>
-                    <p class="card-text text-muted mb-0">实习招聘</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card stat-card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <div class="stat-icon bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
-                        <i class="fas fa-users text-info"></i>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">社会招聘</h6>
+                            <h2 class="mb-0">{{ stats.by_type.experienced|default(0) }}</h2>
+                        </div>
+                        <div class="text-white-50">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
                     </div>
-                    <h3 class="stat-number text-info mb-2">{{ stats.by_type.experienced }}</h3>
-                    <p class="card-text text-muted mb-0">社会招聘</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 快速导航 -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <h2 class="section-title mb-4">快速导航</h2>
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <a href="{{ url_for('jobs', job_type='campus') }}" class="card nav-card border-0 shadow-sm text-decoration-none h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-graduation-cap fa-3x text-success mb-3"></i>
-                            <h5 class="card-title text-dark">校园招聘</h5>
-                            <p class="card-text text-muted">面向应届毕业生的职位</p>
-                        </div>
-                    </a>
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-graduation-cap fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">校园招聘</h5>
+                    <p class="card-text">面向应届毕业生的职位机会</p>
+                    <a href="{{ url_for('campus_jobs') }}" class="btn btn-success">查看职位</a>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <a href="{{ url_for('jobs', job_type='intern') }}" class="card nav-card border-0 shadow-sm text-decoration-none h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-user-graduate fa-3x text-warning mb-3"></i>
-                            <h5 class="card-title text-dark">实习招聘</h5>
-                            <p class="card-text text-muted">实习生职位机会</p>
-                        </div>
-                    </a>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-graduate fa-3x text-warning mb-3"></i>
+                    <h5 class="card-title">实习招聘</h5>
+                    <p class="card-text">在校学生实习机会</p>
+                    <a href="{{ url_for('intern_jobs') }}" class="btn btn-warning">查看职位</a>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <a href="{{ url_for('jobs', job_type='experienced') }}" class="card nav-card border-0 shadow-sm text-decoration-none h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-users fa-3x text-info mb-3"></i>
-                            <h5 class="card-title text-dark">社会招聘</h5>
-                            <p class="card-text text-muted">面向有经验的专业人士</p>
-                        </div>
-                    </a>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x text-info mb-3"></i>
+                    <h5 class="card-title">社会招聘</h5>
+                    <p class="card-text">面向有经验人士的职位</p>
+                    <a href="{{ url_for('experienced_jobs') }}" class="btn btn-info">查看职位</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 热门城市和部门 -->
+    <!-- 统计图表和热门信息 -->
     <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-transparent border-0 pb-0">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-map-marker-alt text-primary me-2"></i>热门城市
-                    </h5>
+        <!-- 职位类型分布图 -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>职位类型分布</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        {% for city, count in stats.top_cities[:8] %}
-                        <div class="col-6 mb-2">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted">{{ city }}</span>
-                                <span class="badge bg-primary rounded-pill">{{ count }}</span>
-                            </div>
-                        </div>
-                        {% endfor %}
+                    <div style="height: 300px;">
+                        <canvas id="jobTypeChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-transparent border-0 pb-0">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-building text-primary me-2"></i>热门部门
-                    </h5>
+        
+        <!-- 热门城市 -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>热门城市</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        {% for dept, count in stats.top_departments[:8] %}
-                        <div class="col-6 mb-2">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted">{{ dept }}</span>
-                                <span class="badge bg-success rounded-pill">{{ count }}</span>
-                            </div>
+                    {% if stats.by_city %}
+                        {% for city, count in stats.by_city.items()[:5] %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>{{ city }}</span>
+                            <span class="badge bg-primary">{{ count }}</span>
                         </div>
                         {% endfor %}
-                    </div>
+                    {% else %}
+                        <p class="text-muted">暂无数据</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 热门部门 -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-building me-2"></i>热门部门</h5>
+                </div>
+                <div class="card-body">
+                    {% if stats.by_department %}
+                        {% for dept, count in stats.by_department.items()[:5] %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>{{ dept }}</span>
+                            <span class="badge bg-info">{{ count }}</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">暂无数据</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -185,6 +211,13 @@
 
 {% block scripts %}
 <script>
+// 定义数据变量
+const chartData = {
+    campus: {{ stats.by_type.campus|default(0) }},
+    intern: {{ stats.by_type.intern|default(0) }},
+    experienced: {{ stats.by_type.experienced|default(0) }}
+};
+
 // 职位类型分布图表
 document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('jobTypeChart').getContext('2d');
@@ -193,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
             labels: ['校园招聘', '实习招聘', '社会招聘'],
             datasets: [{
-                data: [{{ stats.by_type.campus|default(0) }}, {{ stats.by_type.intern|default(0) }}, {{ stats.by_type.experienced|default(0) }}],
+                data: [chartData.campus, chartData.intern, chartData.experienced],
                 backgroundColor: [
                     '#28a745',
                     '#ffc107', 
