@@ -31,14 +31,22 @@ DATA_DIR = "/app/data"
 path = "/"
 port = "$PORT"
 
-# 资源配置（针对Playwright优化）
 [resources]
-memory = "2GB"  # Playwright需要更多内存
-cpu = "1.0"     # 提升CPU配置以支持浏览器渲染
+# 使用预装Playwright镜像的优化配置
+memory = "2GB"  # 预装镜像需要更少内存
+cpu = "1.0"     # 单核即可满足需求
 
-# 超时配置
+# 原版方案配置（如果预装镜像不可用）
+# memory = "4GB"
+# cpu = "2.0"
+
+# 简化版方案配置（不推荐，仅供参考）
+# memory = "1GB"
+# cpu = "0.5"
+
 [timeout]
-build = 600     # 构建超时10分钟（Playwright安装需要时间）
+# 优化的超时配置（预装镜像构建更快）
+build = 600     # 构建超时10分钟
 start = 120     # 启动超时2分钟
 
 # 持久化存储

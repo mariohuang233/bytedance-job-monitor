@@ -16,21 +16,51 @@ CRITICAL - ❌ Playwright 浏览器依赖未安装！
 
 **解决方案:**
 
-#### 方案1: 使用 Zeabur 专用 Dockerfile（推荐）
+#### 方案1: 使用预装Playwright镜像（最新推荐）
 
-项目已提供 `Dockerfile.zeabur`，专门针对 Zeabur 平台优化：
+项目已更新 `Dockerfile.zeabur`，使用微软官方预装Playwright的镜像：
 
 1. **确认配置文件**
    ```toml
    # zeabur.toml
    [build]
    buildCommand = "docker build -f Dockerfile.zeabur -t bytedance-job-monitor ."
+   
+   [resources]
+   memory = "2GB"  # 预装镜像需要更少资源
+   cpu = "1.0"
+   
+   [timeout]
+   build = 600     # 构建更快，10分钟足够
+   start = 120
    ```
 
 2. **重新部署**
    - 推送代码到 GitHub
    - 在 Zeabur 控制台触发重新部署
-   - 等待构建完成（可能需要 15-20 分钟）
+   - 构建时间大幅缩短（5-10分钟）
+
+#### 方案2: 使用Selenium备选方案
+
+如果Playwright仍有问题，可以尝试Selenium方案：
+
+1. **修改配置**
+   ```toml
+   # zeabur.toml
+   [build]
+   buildCommand = "docker build -f Dockerfile.selenium -t bytedance-job-monitor ."
+   
+   [deploy]
+   startCommand = "python app_selenium.py"
+   
+   [resources]
+   memory = "1GB"  # Selenium需要更少资源
+   cpu = "0.5"
+   ```
+
+2. **重新部署**
+   - 推送代码更改
+   - 触发重新部署
 
 #### 方案2: 增加构建资源和超时
 
