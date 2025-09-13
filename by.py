@@ -25,10 +25,12 @@ logging.basicConfig(
 )
 
 # 文件名及路径配置
-# 文件将保存在当前用户的"文稿" (Documents) 文件夹下
-DOCUMENTS_PATH = Path.home() / "Documents"
-OUTPUT_FILENAME = DOCUMENTS_PATH / "bytedance_jobs_tracker.xlsx"
-JSON_CACHE_FILENAME = DOCUMENTS_PATH / "bytedance_jobs_cache.json"
+# 文件将保存在项目的data目录下
+PROJECT_PATH = Path(__file__).parent
+DATA_PATH = PROJECT_PATH / "data"
+DATA_PATH.mkdir(exist_ok=True)  # 确保data目录存在
+OUTPUT_FILENAME = DATA_PATH / "bytedance_jobs_tracker.xlsx"
+JSON_CACHE_FILENAME = DATA_PATH / "bytedance_jobs_cache.json"
 
 # 任务配置
 TASK_CONFIGS: List[Dict[str, Any]] = [
@@ -558,7 +560,7 @@ class JobMonitor:
         logging.info(f"--- 开始监控 {start_time.strftime('%Y-%m-%d %H:%M:%S')} ---")
         
         # 确保输出目录存在
-        DOCUMENTS_PATH.mkdir(exist_ok=True)
+        DATA_PATH.mkdir(exist_ok=True)
         
         existing_hashes, existing_dataframes = self._load_existing_hashes()
         
