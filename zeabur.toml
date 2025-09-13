@@ -3,8 +3,11 @@
 # 基于测试结果，推荐使用原版Playwright方案以避免反爬虫问题
 
 [build]
-# 原版构建（推荐）- 使用Playwright，能有效绕过反爬虫检测
-buildCommand = "docker build -t bytedance-job-monitor ."
+# Zeabur专用构建（推荐）- 针对Zeabur平台优化的Playwright配置
+buildCommand = "docker build -f Dockerfile.zeabur -t bytedance-job-monitor ."
+
+# 原版构建（备选）- 标准Playwright配置
+# buildCommand = "docker build -t bytedance-job-monitor ."
 
 # 简化版构建（不推荐）- API方式存在反爬虫问题，数据获取成功率低
 # buildCommand = "docker build -f Dockerfile.simple -t bytedance-jobs-monitor-simple ."

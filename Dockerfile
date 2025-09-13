@@ -17,6 +17,16 @@ RUN apt-get update && apt-get install -y \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
+    libglib2.0-0 \
+    libnss3-dev \
+    libatk-bridge2.0-dev \
+    libdrm-dev \
+    libxcomposite-dev \
+    libxdamage-dev \
+    libxrandr-dev \
+    libgbm-dev \
+    libxss-dev \
+    libasound2-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 设置工作目录
@@ -26,7 +36,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 安装playwright浏览器
+# 安装playwright系统依赖和浏览器
+RUN playwright install-deps
 RUN playwright install chromium
 
 # 复制应用代码

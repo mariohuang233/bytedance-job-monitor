@@ -1,0 +1,63 @@
+# Zeabur 专用 Dockerfile
+# 针对 Zeabur 平台优化的 Playwright 配置
+
+# 使用 Ubuntu 基础镜像，更好支持 Playwright
+FROM ubuntu:22.04
+
+# 设置环境变量
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# 安装 Python 和基础依赖
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3.11-pip \
+    python3.11-dev \
+    python3.11-venv \
+    curl \
+    wget \
+    gnupg \
+    ca-certificates \
+    && ln -s /usr/bin/python3.11 /usr/bin/python \
+    && ln -s /usr/bin/pip3 /usr/bin/pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制 requirements.txt 并安装 Python 依赖
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 安装 Playwright 系统依赖
+RUN playwright install-deps chromium
+
+# 安装 Playwright 浏览器
+RUN playwright install chromium
+
+# 验证 Playwright 安装
+RUN python -c "from playwright.sync_api import sync_playwright; print('Playwright installed successfully')"
+
+# 复制应用代码
+COPY . .
+
+# 创建数据目录并设置权限
+RUN mkdir -p /app/data && chmod 755 /app/data
+
+# 暴露端口
+EXPOSE 8080
+
+# 设置环境变量
+ENV FLASK_APP=app.py
+ENV FLASK_ENV=production
+ENV PYTHONPATH=/app
+ENV DATA_DIR=/app/data
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/ || exit 1
+
+# 启动命令
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--timeout", "120", "--preload", "app:app"]
