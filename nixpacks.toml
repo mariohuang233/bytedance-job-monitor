@@ -1,5 +1,40 @@
 [phases.setup]
-nixPkgs = ["python311", "pip"]
+nixPkgs = [
+  "python311", 
+  "pip",
+  "chromium",
+  "nodejs",
+  "wget",
+  "gnupg",
+  "ca-certificates",
+  "fontconfig",
+  "freetype",
+  "harfbuzz",
+  "ca-certificates",
+  "ttf-liberation",
+  "glib",
+  "nss",
+  "nspr",
+  "atk",
+  "at-spi2-atk",
+  "libdrm",
+  "xorg.libxcb",
+  "xorg.libX11",
+  "xorg.libXcomposite",
+  "xorg.libXdamage",
+  "xorg.libXext",
+  "xorg.libXfixes",
+  "xorg.libXrandr",
+  "xorg.libXrender",
+  "xorg.libxshmfence",
+  "xorg.libXxf86vm",
+  "gtk3",
+  "pango",
+  "cairo",
+  "gdk-pixbuf",
+  "libxkbcommon",
+  "alsa-lib"
+]
 
 [phases.install]
 cmds = [

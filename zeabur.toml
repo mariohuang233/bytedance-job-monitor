@@ -1,0 +1,31 @@
+# Zeabur 部署配置文件
+# 专为 Zeabur 平台优化的配置
+
+[build]
+# 使用 Docker 构建，确保环境一致性
+buildCommand = "docker build -t bytedance-job-monitor ."
+
+[deploy]
+# 使用预构建的 Docker 镜像
+startCommand = "gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 app:app"
+
+# 环境变量
+[env]
+FLASK_ENV = "production"
+FLASK_DEBUG = "False"
+PYTHONPATH = "/app"
+DATA_DIR = "/app/data"
+
+# 健康检查
+[health]
+path = "/"
+port = "$PORT"
+
+# 资源配置
+[resources]
+memory = "1GB"
+cpu = "0.5"
+
+# 持久化存储
+[volumes]
+"/app/data" = "data-volume"

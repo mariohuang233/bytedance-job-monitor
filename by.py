@@ -599,8 +599,12 @@ if __name__ == "__main__":
         logging.info("\n⚠️ 程序被用户中断。")
         sys.exit(0)
     except Exception as e:
-        if "Executable doesn't exist" in str(e):
-            logging.critical("❌ Playwright 浏览器依赖未安装! 请运行 'playwright install' 命令。")
+        if "Executable doesn't exist" in str(e) or "playwright" in str(e).lower():
+            logging.critical("❌ Playwright 浏览器依赖未安装!")
+            logging.critical("解决方案:")
+            logging.critical("1. 本地环境: 运行 'playwright install chromium'")
+            logging.critical("2. Docker环境: 确保Dockerfile包含 'RUN playwright install chromium'")
+            logging.critical("3. Zeabur部署: 使用Docker构建或确保nixpacks.toml配置正确")
         else:
             logging.critical(f"\n❌ 程序发生严重错误: {e}", exc_info=True)
         sys.exit(1)
