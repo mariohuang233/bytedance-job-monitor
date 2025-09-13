@@ -2,21 +2,52 @@
 
 ## 🚨 常见问题及解决方案
 
-### 问题1: Playwright 浏览器依赖未安装
+### 问题1: 浏览器依赖安装失败
 
 **错误信息:**
 ```
-CRITICAL - ❌ Playwright 浏览器依赖未安装！
+CRITICAL - ❌ 浏览器依赖未安装！
 ```
 
 **原因分析:**
-- Docker 构建过程中 Playwright 安装失败
+- Docker 构建过程中浏览器依赖安装失败
 - 系统依赖不完整
 - 构建超时导致安装中断
 
 **解决方案:**
 
-#### 方案1: 使用预装Playwright镜像（最新推荐）
+#### 方案1: 纯API版本（强烈推荐）
+
+这是目前最推荐的解决方案，完全避免浏览器依赖，使用纯API方式获取数据。
+
+**优势：**
+- 完全无浏览器依赖，部署成功率最高
+- 构建时间最短（1-2分钟）
+- 资源需求最低（512MB内存，0.25核CPU）
+- 启动速度最快
+- 维护成本最低
+
+1. **确认配置文件**
+   ```toml
+   # zeabur.toml
+   [build]
+   buildCommand = "docker build -f Dockerfile.api -t bytedance-job-monitor ."
+   
+   [resources]
+   memory = "512MB"  # 纯API版本资源需求极低
+   cpu = "0.25"
+   
+   [timeout]
+   build = 300     # 构建极快，5分钟足够
+   start = 60
+   ```
+
+2. **重新部署**
+   - 推送代码到 GitHub
+   - 在 Zeabur 控制台触发重新部署
+   - 构建时间极短（1-2分钟）
+
+#### 方案2: 使用预装Playwright镜像
 
 项目已更新 `Dockerfile.zeabur`，使用微软官方预装Playwright的镜像：
 
@@ -40,9 +71,9 @@ CRITICAL - ❌ Playwright 浏览器依赖未安装！
    - 在 Zeabur 控制台触发重新部署
    - 构建时间大幅缩短（5-10分钟）
 
-#### 方案2: 使用Selenium备选方案
+#### 方案3: 使用Selenium备选方案
 
-如果Playwright仍有问题，可以尝试Selenium方案：
+如果需要浏览器功能但Playwright失败，可以尝试Selenium：
 
 1. **修改配置**
    ```toml
@@ -59,8 +90,8 @@ CRITICAL - ❌ Playwright 浏览器依赖未安装！
    ```
 
 2. **重新部署**
-   - 推送代码更改
-   - 触发重新部署
+   - 推送代码更改到GitHub
+   - 在Zeabur控制台触发重新部署
 
 #### 方案2: 增加构建资源和超时
 
