@@ -53,14 +53,6 @@ cpu = "1.0"       # 一个完整核心
 [timeout]
 build = 900       # 构建超时15分钟（Playwright镜像较大）
 start = 180       # 启动超时3分钟
-# cpu = "0.5"
-# memory = "512MB" # 纯API版本（资源需求最低）
-# cpu = "0.25"
-
-[timeout]
-# Playwright版本超时配置（需要更多时间安装浏览器）
-build = 600     # 构建超时10分钟（包含浏览器安装）
-start = 120     # 启动超时2分钟
 
 # 持久化存储
 [volumes]
