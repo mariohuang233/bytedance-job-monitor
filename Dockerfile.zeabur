@@ -17,8 +17,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 验证 Playwright 安装
+# 验证 Playwright 安装并设置权限
 RUN python -c "from playwright.sync_api import sync_playwright; print('Playwright ready!')"
+RUN chmod -R 755 /ms-playwright
 
 # 复制应用代码
 COPY . .
@@ -34,10 +35,12 @@ ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
 ENV PYTHONPATH=/app
 ENV DATA_DIR=/app/data
+ENV DISPLAY=:99
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD python -c "import requests; requests.get('http://localhost:8080/', timeout=5)" || exit 1
 
-# 启动命令 - 使用更简单的配置
-CMD ["python", "-m", "gunicorn", "--bind", "0.0.0.0:8080", "--workers", "1", "--timeout", "120", "app:app"]
+# 启动命令 - 使用gunicorn提供更好的生产环境支持
+CMD ["python", "-m", "gunicorn", "--bind", "0.0.0.0:8080", "--workers", "1", "--timeout", "120", "--preload", "app:app"]

@@ -15,14 +15,17 @@ RUN apt-get update && apt-get install -y \
 # 设置工作目录
 WORKDIR /app
 
-# 复制依赖文件（现在requirements.txt就是纯API版本）
+# 复制依赖文件并安装
 COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 复制应用代码（现在app.py就是纯API版本）
-COPY app.py .
-COPY templates/ ./templates/
-COPY static/ ./static/
+# 安装Playwright浏览器
+RUN playwright install chromium
+RUN playwright install-deps
+
+# 复制应用代码
+COPY . .
 
 # 创建数据目录
 RUN mkdir -p /app/data
@@ -31,7 +34,7 @@ RUN mkdir -p /app/data
 EXPOSE 8080
 
 # 启动命令
-CMD ["python", "app.py"]
+CMD ["python", "-m", "gunicorn", "--bind", "0.0.0.0:8080", "--workers", "1", "--timeout", "120", "app:app"]
 
 # 设置环境变量
 ENV FLASK_APP=app.py

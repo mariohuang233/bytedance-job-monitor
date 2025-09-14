@@ -10,26 +10,24 @@
 # 强制重建配置
 nocache = true
 
-# Zeabur专用Playwright版本（备选1）- 预装Playwright镜像
-# buildCommand = "docker build -f Dockerfile.zeabur -t bytedance-job-monitor ."
+# 使用Zeabur专用Playwright版本 - 预装Playwright镜像（推荐）
+buildCommand = "docker build -f Dockerfile.zeabur -t bytedance-job-monitor ."
 
-# Selenium版本（备选2）- 轻量级浏览器方案
-# buildCommand = "docker build -f Dockerfile.selenium -t bytedance-job-monitor ."
-
-# 原版Playwright（备选3）- 标准配置
-# buildCommand = "docker build -t bytedance-job-monitor ."
+# 备选方案（如需要）：
+# buildCommand = "docker build -f Dockerfile.selenium -t bytedance-job-monitor ."  # Selenium版本
+# buildCommand = "docker build -f Dockerfile -t bytedance-job-monitor ."          # 原版Playwright
 
 # 简化版API（备选4）- 基础API方案
 # buildCommand = "docker build -f Dockerfile.simple -t bytedance-jobs-monitor-simple ."
 
 [deploy]
-# 纯API版本启动命令（现在app.py就是纯API版本）
-startCommand = "python app.py"
+# Playwright版本启动命令
+startCommand = "python -m gunicorn --bind 0.0.0.0:8080 --workers 1 --timeout 120 app:app"
 
-# 其他版本启动命令（备选）
-# startCommand = "python app.py"          # 原版Playwright
+# 备选启动命令：
+# startCommand = "python app.py"          # 直接启动（开发用）
 # startCommand = "python app_selenium.py"  # Selenium版本
-# startCommand = "python start_simple.py" # 简化版API
+# startCommand = "python app_api_only.py"  # 纯API版本
 
 # 环境变量
 [env]
@@ -44,22 +42,20 @@ path = "/"
 port = "$PORT"
 
 [resources]
-# 纯API版本配置（推荐）- 资源需求最低
-memory = "512MB"  # 纯API版本只需要512MB
-cpu = "0.25"      # 四分之一核心即可
+# Playwright版本配置（推荐）- 浏览器功能完整
+memory = "2GB"    # Playwright需要更多内存
+cpu = "1.0"       # 一个完整核心
 
-# Playwright版本配置（如需要浏览器功能）
-# memory = "2GB"
-# cpu = "1.0"
-
-# Selenium版本配置（轻量级浏览器）
-# memory = "1GB"
+# 备选配置：
+# memory = "1GB"   # Selenium版本（轻量级浏览器）
 # cpu = "0.5"
+# memory = "512MB" # 纯API版本（资源需求最低）
+# cpu = "0.25"
 
 [timeout]
-# 纯API版本超时配置（构建和启动都很快）
-build = 300     # 构建超时5分钟（无浏览器依赖）
-start = 60      # 启动超时1分钟
+# Playwright版本超时配置（需要更多时间安装浏览器）
+build = 600     # 构建超时10分钟（包含浏览器安装）
+start = 120     # 启动超时2分钟
 
 # 持久化存储
 [volumes]
