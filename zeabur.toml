@@ -23,8 +23,8 @@ nocache = true
 # buildCommand = "docker build -f Dockerfile.simple -t bytedance-jobs-monitor-simple ."
 
 [deploy]
-# 纯API版本启动命令（推荐）
-startCommand = "python app_api_only.py"
+# 纯API版本启动命令（现在app.py就是纯API版本）
+startCommand = "python app.py"
 
 # 其他版本启动命令（备选）
 # startCommand = "python app.py"          # 原版Playwright

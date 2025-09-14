@@ -15,12 +15,12 @@ RUN apt-get update && apt-get install -y \
 # 设置工作目录
 WORKDIR /app
 
-# 复制纯API版本的依赖文件
-COPY requirements_api.txt .
-RUN pip install --no-cache-dir -r requirements_api.txt
+# 复制依赖文件（现在requirements.txt就是纯API版本）
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# 复制应用代码
-COPY app_api_only.py .
+# 复制应用代码（现在app.py就是纯API版本）
+COPY app.py .
 COPY templates/ ./templates/
 COPY static/ ./static/
 
@@ -31,7 +31,7 @@ RUN mkdir -p /app/data
 EXPOSE 8080
 
 # 启动命令
-CMD ["python", "app_api_only.py"]
+CMD ["python", "app.py"]
 
 # 设置环境变量
 ENV FLASK_APP=app.py
