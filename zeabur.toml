@@ -3,9 +3,9 @@
 # 版本: v2.0 - 纯API方案，完全避免浏览器依赖问题
 
 [build]
-# 纯API版本（强烈推荐）- 无浏览器依赖，部署成功率最高
+# 纯API版本 - 使用默认Dockerfile（已优化为纯API版本）
 # 版本标识: API-v2.0-20250114
-buildCommand = "docker build -f Dockerfile.api -t bytedance-job-monitor:api-v2 ."
+# Zeabur会自动检测并使用Dockerfile
 
 # 强制重建配置
 nocache = true

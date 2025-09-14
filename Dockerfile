@@ -1,53 +1,37 @@
-# 使用Python 3.11官方镜像作为基础镜像
+# 纯API版本 - 完全避免浏览器依赖
+# 版本: v2.0 - 专为Zeabur平台优化
 FROM python:3.11-slim
 
-# 安装系统依赖（playwright需要）
+# 设置环境变量
+ENV PYTHONUNBUFFERED=1
+ENV FLASK_ENV=production
+ENV PORT=8080
+
+# 安装基础系统工具（仅curl用于健康检查）
 RUN apt-get update && apt-get install -y \
-    wget \
-    gnupg \
-    ca-certificates \
-    fonts-liberation \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libdrm2 \
-    libgtk-3-0 \
-    libnspr4 \
-    libnss3 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxrandr2 \
-    xdg-utils \
-    libglib2.0-0 \
-    libnss3-dev \
-    libatk-bridge2.0-dev \
-    libdrm-dev \
-    libxcomposite-dev \
-    libxdamage-dev \
-    libxrandr-dev \
-    libgbm-dev \
-    libxss-dev \
-    libasound2-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # 设置工作目录
 WORKDIR /app
 
-# 复制requirements.txt并安装依赖
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# 安装playwright系统依赖和浏览器
-RUN playwright install-deps
-RUN playwright install chromium
+# 复制纯API版本的依赖文件
+COPY requirements_api.txt .
+RUN pip install --no-cache-dir -r requirements_api.txt
 
 # 复制应用代码
-COPY . .
+COPY app_api_only.py .
+COPY templates/ ./templates/
+COPY static/ ./static/
 
 # 创建数据目录
 RUN mkdir -p /app/data
 
 # 暴露端口
 EXPOSE 8080
+
+# 启动命令
+CMD ["python", "app_api_only.py"]
 
 # 设置环境变量
 ENV FLASK_APP=app.py
