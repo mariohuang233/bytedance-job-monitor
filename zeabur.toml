@@ -48,6 +48,11 @@ cpu = "1.0"       # 一个完整核心
 
 # 备选配置：
 # memory = "1GB"   # Selenium版本（轻量级浏览器）
+
+# 超时配置 - 防止构建和启动超时
+[timeout]
+build = 900       # 构建超时15分钟（Playwright镜像较大）
+start = 180       # 启动超时3分钟
 # cpu = "0.5"
 # memory = "512MB" # 纯API版本（资源需求最低）
 # cpu = "0.25"

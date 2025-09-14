@@ -8,9 +8,16 @@ FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+ENV DEBIAN_FRONTEND=noninteractive
 
 # 设置工作目录
 WORKDIR /app
+
+# 更新系统包并安装必要依赖
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # 复制 requirements.txt 并安装 Python 依赖
 COPY requirements.txt .
@@ -18,8 +25,11 @@ RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 验证 Playwright 安装并设置权限
-RUN python -c "from playwright.sync_api import sync_playwright; print('Playwright ready!')"
-RUN chmod -R 755 /ms-playwright
+RUN python -c "from playwright.sync_api import sync_playwright; print('Playwright ready!')" || \
+    (echo 'Playwright verification failed, attempting reinstall...' && \
+     python -m playwright install chromium && \
+     python -c "from playwright.sync_api import sync_playwright; print('Playwright ready after reinstall!')")
+RUN chmod -R 755 /ms-playwright || echo 'Warning: Could not set permissions on /ms-playwright'
 
 # 复制应用代码
 COPY . .
