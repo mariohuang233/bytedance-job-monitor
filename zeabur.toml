@@ -10,8 +10,8 @@
 # 强制重建配置
 nocache = true
 
-# 使用Zeabur专用Playwright版本 - 预装Playwright镜像（推荐）
-buildCommand = "docker build -f Dockerfile.zeabur -t bytedance-job-monitor ."
+# 使用Selenium版本 - 更稳定的浏览器自动化方案
+buildCommand = "docker build -f Dockerfile.selenium -t bytedance-job-monitor ."
 
 # 备选方案（如需要）：
 # buildCommand = "docker build -f Dockerfile.selenium -t bytedance-job-monitor ."  # Selenium版本
@@ -21,8 +21,8 @@ buildCommand = "docker build -f Dockerfile.zeabur -t bytedance-job-monitor ."
 # buildCommand = "docker build -f Dockerfile.simple -t bytedance-jobs-monitor-simple ."
 
 [deploy]
-# Playwright版本启动命令
-startCommand = "python -m gunicorn --bind 0.0.0.0:8080 --workers 1 --timeout 120 app:app"
+# Selenium版本启动命令
+startCommand = "python -m gunicorn --bind 0.0.0.0:8080 --workers 1 --timeout 120 app_selenium:app"
 
 # 备选启动命令：
 # startCommand = "python app.py"          # 直接启动（开发用）
@@ -42,9 +42,9 @@ path = "/"
 port = "$PORT"
 
 [resources]
-# Playwright版本配置（推荐）- 浏览器功能完整
-memory = "2GB"    # Playwright需要更多内存
-cpu = "1.0"       # 一个完整核心
+# Selenium版本配置 - 资源需求更低，稳定性更好
+memory = "1.5GB"  # Selenium需要较少内存
+cpu = "0.8"       # 适中的CPU配置
 
 # 备选配置：
 # memory = "1GB"   # Selenium版本（轻量级浏览器）
