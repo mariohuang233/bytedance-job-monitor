@@ -1,10 +1,14 @@
-# Zeabur 部署配置文件
+# Zeabur 部署配置文件 - 纯API版本
 # 专为 Zeabur 平台优化的配置
-# 基于测试结果，推荐使用原版Playwright方案以避免反爬虫问题
+# 版本: v2.0 - 纯API方案，完全避免浏览器依赖问题
 
 [build]
 # 纯API版本（强烈推荐）- 无浏览器依赖，部署成功率最高
-buildCommand = "docker build -f Dockerfile.api -t bytedance-job-monitor ."
+# 版本标识: API-v2.0-20250114
+buildCommand = "docker build -f Dockerfile.api -t bytedance-job-monitor:api-v2 ."
+
+# 强制重建配置
+nocache = true
 
 # Zeabur专用Playwright版本（备选1）- 预装Playwright镜像
 # buildCommand = "docker build -f Dockerfile.zeabur -t bytedance-job-monitor ."

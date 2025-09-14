@@ -436,9 +436,13 @@ def health_check():
         }), 500
 
 if __name__ == '__main__':
-    logger.info("启动字节跳动招聘监控系统 - 纯API版本")
+    logger.info("=" * 50)
+    logger.info("🚀 字节跳动招聘监控系统 - 纯API版本 v2.0")
     logger.info("✅ 无浏览器依赖，轻量级部署")
     logger.info("✅ 支持模拟数据备份，确保服务可用")
-    
+    logger.info("✅ 完全避免Playwright/Selenium问题")
+    logger.info("=" * 50)
+
     port = int(os.getenv('PORT', 8080))
+    logger.info(f"🌐 服务启动在端口: {port}")
     app.run(host='0.0.0.0', port=port, debug=False)
